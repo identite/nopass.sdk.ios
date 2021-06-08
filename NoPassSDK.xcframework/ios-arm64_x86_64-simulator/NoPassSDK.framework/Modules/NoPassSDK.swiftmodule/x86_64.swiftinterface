@@ -61,6 +61,7 @@ public func setLogEnabled(_ enabled: Swift.Bool)
   final public var username: Swift.String
   final public var portalid: Swift.String
   final public var portalName: Swift.String
+  final public var portalType: Swift.String?
   final public var apikey: Swift.String
   final public var isRestore: Swift.Bool
   final public func hash(into hasher: inout Swift.Hasher)
@@ -69,6 +70,12 @@ public func setLogEnabled(_ enabled: Swift.Bool)
   final public var hashValue: Swift.Int {
     get
   }
+}
+@_hasMissingDesignatedInitializers public class NoPassConnectivity {
+  public class var isConnectedToInternet: Swift.Bool {
+    get
+  }
+  @objc deinit
 }
 @_hasMissingDesignatedInitializers open class Request {
   open var delegate: NoPassSDK.TaskDelegate {
@@ -226,7 +233,6 @@ public protocol NoPassSynchronisationServiceDelegate : AnyObject {
   public static let shared: NoPassSDK.NoPassSynchronisationService
   weak public var delegate: NoPassSDK.NoPassSynchronisationServiceDelegate?
   public func startSyncAccount(result: Swift.String, enabled2FaMethod: NoPassSDK.BiometricType, isScreenLock: Swift.Bool)
-  public func finishAccountSynchronisation(confirmId: Swift.String, enabled2FaMethod: NoPassSDK.BiometricType, isScreenLock: Swift.Bool)
   @objc deinit
 }
 extension NoPassSynchronisationService : NoPassSDK.NoPassRegistrationServiceDelegate {
@@ -244,7 +250,7 @@ public struct NoPassAuthModel {
   public func fetchHisory() -> [NoPassSDK.NoPassHistory]
   public func removeAccount(account: NoPassSDK.NoPassAccount, enabled2FaMethod: NoPassSDK.BiometricType, isScreenLock: Swift.Bool, completion: ((Foundation.NSError?) -> Swift.Void)?)
   public func clearBackupData()
-  public func emptymptyBackupData(pin: Swift.String) -> Swift.String
+  public func emptyBackupData(pin: Swift.String) -> Swift.String
   public func isCanDecodeBackupFile(encodedString: Swift.String, pin: Swift.String) -> Swift.Bool
   public func backupAccounts(pin: Swift.String, encryptedBackupData: Swift.String?, enabled2FaMethod: NoPassSDK.BiometricType, isSreenLock: Swift.Bool, completion: ((NoPassSDK.NopassError?, Swift.String?) -> Swift.Void)?)
   public func restoreAccounts(backupData: Swift.String, pin: Swift.String, delegate: NoPassSDK.RestoreFlowDelegate?, enabled2FaMethod: NoPassSDK.BiometricType, isScreenLock: Swift.Bool, restoreDidStart: ((Swift.Int, NoPassSDK.NopassError?) -> Swift.Void)?)
@@ -423,6 +429,7 @@ public protocol NoPassAuthServiceDelegate : AnyObject {
   public func isHaveAuthSessionNow() -> Swift.Bool
   public func getAuthComparisonContent(data: [Swift.String : Any], userSeed: Swift.String) -> NoPassSDK.NoPassAuthComparisonContent?
   public func startAuthFlow(data: [Swift.AnyHashable : Any], enabled2FaMethod: NoPassSDK.BiometricType, isScreenLock: Swift.Bool) -> NoPassSDK.NoPassAuthModel?
+  public func notificationAuthId(data: [Swift.AnyHashable : Any]) -> Swift.String?
   public func authorize(enabled2FaMethod: NoPassSDK.BiometricType = .null, isScreenLock: Swift.Bool)
   public func decline(type: NoPassSDK.DeclineType, enabled2FaMethod: NoPassSDK.BiometricType, isScreenLock: Swift.Bool)
   @objc deinit
@@ -547,6 +554,10 @@ extension Account {
     @objc set
   }
   @objc @NSManaged dynamic public var portalName: Swift.String? {
+    @objc get
+    @objc set
+  }
+  @objc @NSManaged dynamic public var portalType: Swift.String? {
     @objc get
     @objc set
   }

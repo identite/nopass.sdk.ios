@@ -225,6 +225,7 @@ SWIFT_CLASS_NAMED("Account")
 @property (nonatomic) BOOL isAccountBackup;
 @property (nonatomic, copy) NSString * _Nullable portalId;
 @property (nonatomic, copy) NSString * _Nullable portalName;
+@property (nonatomic, copy) NSString * _Nullable portalType;
 @property (nonatomic, copy) NSString * _Nullable portalUrl;
 @property (nonatomic, copy) NSString * _Nullable serverUrl;
 @property (nonatomic, copy) NSString * _Nullable userCode;
