@@ -223,6 +223,10 @@ public struct URLEncoding {
   public func queryComponents(fromKey key: Swift.String, value: Any) -> [(Swift.String, Swift.String)]
   public func escape(_ string: Swift.String) -> Swift.String
 }
+@_hasMissingDesignatedInitializers public class ImageProvider {
+  public static func image(named: Swift.String) -> UIKit.UIImage?
+  @objc deinit
+}
 public protocol NoPassSynchronisationServiceDelegate : AnyObject {
   func synchronisationDidFinish()
   func syncRegistrationCode(code: Swift.String, isNeedConfirmationCode: Swift.Bool)
@@ -399,15 +403,11 @@ extension SessionDelegate : Foundation.URLSessionStreamDelegate {
   @objc dynamic open func urlSession(_ session: Foundation.URLSession, betterRouteDiscoveredFor streamTask: Foundation.URLSessionStreamTask)
   @objc dynamic open func urlSession(_ session: Foundation.URLSession, streamTask: Foundation.URLSessionStreamTask, didBecome inputStream: Foundation.InputStream, outputStream: Foundation.OutputStream)
 }
-public enum AuthStatus {
+public enum AuthStatus : Swift.Equatable {
   case accept
-  case decline
+  case decline(logEventId: Swift.Int?)
   case declineFromOtherDevice
   public static func == (a: NoPassSDK.AuthStatus, b: NoPassSDK.AuthStatus) -> Swift.Bool
-  public var hashValue: Swift.Int {
-    get
-  }
-  public func hash(into hasher: inout Swift.Hasher)
 }
 @objc @_inheritsConvenienceInitializers open class NetworkManager : ObjectiveC.NSObject {
   @objc override dynamic public init()
@@ -415,13 +415,13 @@ public enum AuthStatus {
 }
 public struct NoPassAuthComparisonContent {
   public let digits: Swift.String
-  public let imageName: Swift.String
+  public let image: UIKit.UIImage?
   public let customMessage: Swift.String?
 }
 public protocol NoPassAuthServiceDelegate : AnyObject {
   func onAuthDataChange(comparisonContent: NoPassSDK.NoPassAuthComparisonContent, authExparedDate: Foundation.Date, nextUpdate: Foundation.TimeInterval)
   func onRadiusAuthStart(clientName: Swift.String, account: NoPassSDK.NoPassAccount, authExparedDate: Foundation.Date)
-  func onAuthFinish(error: NoPassSDK.NopassError?, authStatus: NoPassSDK.AuthStatus)
+  func onAuthFinish(error: NoPassSDK.NopassError?, authStatus: NoPassSDK.AuthStatus, authData: [Swift.AnyHashable : Any]?)
 }
 @_hasMissingDesignatedInitializers public class NoPassAuthService {
   public static let shared: NoPassSDK.NoPassAuthService
@@ -431,7 +431,8 @@ public protocol NoPassAuthServiceDelegate : AnyObject {
   public func startAuthFlow(data: [Swift.AnyHashable : Any], enabled2FaMethod: NoPassSDK.BiometricType, isScreenLock: Swift.Bool) -> NoPassSDK.NoPassAuthModel?
   public func notificationAuthId(data: [Swift.AnyHashable : Any]) -> Swift.String?
   public func authorize(enabled2FaMethod: NoPassSDK.BiometricType = .null, isScreenLock: Swift.Bool)
-  public func decline(type: NoPassSDK.DeclineType, enabled2FaMethod: NoPassSDK.BiometricType, isScreenLock: Swift.Bool)
+  public func decline(enabled2FaMethod: NoPassSDK.BiometricType, isScreenLock: Swift.Bool)
+  public func updateDecline(authData: [Swift.AnyHashable : Any], logEventId: Swift.Int, declineType: NoPassSDK.DeclineType, completion: ((Foundation.NSError?) -> Swift.Void)?)
   @objc deinit
 }
 public protocol NoPassRegistrationServiceDelegate : AnyObject {
@@ -466,6 +467,8 @@ public enum NopassError : Swift.Error {
   case restoreAccounts
   case invalidSynchronisationData
   case invalidQRCode
+  case restoringIsBlocked(message: Swift.String)
+  case restoringWillBeBlocked(message: Swift.String)
 }
 extension NopassError {
   public var errorDescription: Swift.String {
@@ -630,8 +633,6 @@ extension NoPassSDK.DeclineType : Swift.RawRepresentable {}
 extension NoPassSDK.NoPassPushNotificationWorkflow : Swift.Equatable {}
 extension NoPassSDK.NoPassPushNotificationWorkflow : Swift.Hashable {}
 extension NoPassSDK.NoPassPushNotificationWorkflow : Swift.RawRepresentable {}
-extension NoPassSDK.AuthStatus : Swift.Equatable {}
-extension NoPassSDK.AuthStatus : Swift.Hashable {}
 extension NoPassSDK.BiometricType : Swift.Equatable {}
 extension NoPassSDK.BiometricType : Swift.Hashable {}
 extension NoPassSDK.BiometricType : Swift.RawRepresentable {}
